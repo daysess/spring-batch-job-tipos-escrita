@@ -16,10 +16,11 @@ public class FolhaPontoJobConfig {
 	private JobBuilderFactory jobBuilderFactory;
 	
 	@Bean
-	public Job folhaPontoJob(Step folhaPontoStep) {
+	public Job folhaPontoJob(Step folhaPontoStep, Step funcionarioSemPontoStep) {
 		return jobBuilderFactory
 				.get("folhaPontoJob")
 				.start(folhaPontoStep)
+				.start(funcionarioSemPontoStep)
 				.incrementer(new RunIdIncrementer())
 				.build();
 	}

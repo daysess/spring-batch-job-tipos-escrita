@@ -3,8 +3,8 @@ package com.springbatch.folhaponto.step;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +23,7 @@ public class FolhaPontoStepConfig {
 	public Step folhaPontoStep(
 			JdbcCursorItemReader<Funcionario> funcionarioReaderJdbc,
 			ItemProcessor<Funcionario, FolhaPonto> folhaPontoProcessor,
-			@Qualifier("imprimeFolhaPontoWriter") ItemWriter<FolhaPonto> folhaPontoWriter) {
+			@Qualifier("folhaPontoWriter") FlatFileItemWriter<FolhaPonto> folhaPontoWriter) {
 		return stepBuilderFactory
 				.get("folhaPontoStep")
 				.<Funcionario,FolhaPonto>chunk(100)
@@ -32,4 +32,19 @@ public class FolhaPontoStepConfig {
 				.writer(folhaPontoWriter)
 				.build();
 	}
+	
+	@Bean
+	public Step funcionarioSemPontoStep(
+			JdbcCursorItemReader<Funcionario> funcionarioReaderJdbc,
+			ItemProcessor<Funcionario, FolhaPonto> folhaPontoProcessor,
+			@Qualifier("funcionarioSemPontoWriter") FlatFileItemWriter<FolhaPonto> funcionarioSemPontoWriter) {
+		return stepBuilderFactory
+				.get("funcionarioSemPontoStep")
+				.<Funcionario,FolhaPonto>chunk(100)
+				.reader(new FuncionarioReader(funcionarioReaderJdbc))
+				.processor(folhaPontoProcessor)
+				.writer(funcionarioSemPontoWriter)
+				.build();
+	}
+	
 }
